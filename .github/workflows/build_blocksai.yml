@@ -1,0 +1,28 @@
+name: Build BlocksAIBot Dylib
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  compile:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Compile BlocksAIBot
+        run: |
+          xcrun -sdk iphoneos clang++ -dynamiclib -arch arm64 \
+          -isysroot $(xcrun --sdk iphoneos --show-sdk-path) \
+          -framework UIKit -framework Foundation -framework CoreGraphics \
+          -install_name /usr/lib/BlocksAIBot.dylib \
+          BlocksAIBot.mm -o BlocksAIBot.dylib
+
+      - name: Release Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BlocksAIBot-Dylib
+          path: BlocksAIBot.dylib
